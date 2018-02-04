@@ -1,7 +1,7 @@
 const defaultConfig = {
   population: 0,
   pValue: 0.05,
-  zScore: 0,
+  zScore: 1.96,
   errorMargin: 0.5
 };
 
@@ -26,6 +26,7 @@ function mapValidProps(obj) {
       '"population", "pValue", "zScore", "errorMargin".'
     )
   }
+  
   if(invalidKeyCache.length > 0) {
     throw new Error(
       `Unexpected ${invalidKeyCache.length > 1 ? 'keys' : 'key'}: ` +
@@ -36,7 +37,7 @@ function mapValidProps(obj) {
   return results;
 };
 
-function createConfig(settings) {
+function getConfig(settings) {
   let config;
   if(typeof settings === 'object') {
     const reassignedProps = mapValidProps(settings);
@@ -50,4 +51,17 @@ function createConfig(settings) {
   };
 
   return config
+};
+
+export default function sample(config) {
+  const { 
+    population, 
+    pValue, 
+    zScore, 
+    errorMargin 
+  } = getConfig(config);
+  
+  const partition  = (zScore **2) * pValue / (errorMargin **2) 
+  const sample = partition / (1 + (zScore **2) * pValue / ((errorMargin **2) * population));
+  return Math.round(sample);
 };
